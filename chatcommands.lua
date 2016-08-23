@@ -60,7 +60,7 @@ minetest.register_chatcommand("set_owner", {
 
 		local id = areas:add(ownerName, areaName, pos1, pos2, nil)
 		areas:save()
-	
+
 		minetest.chat_send_player(ownerName,
 				"You have been granted control over area #"..
 				id..". Type /list_areas to show your areas.")
@@ -286,6 +286,28 @@ minetest.register_chatcommand("area_open", {
 })
 
 
+minetest.register_chatcommand("area_openfarming", {
+	params = "<ID>",
+	description = "Toggle an area open (anyone can interact farming) or closed",
+	func = function(name, param)
+		local id = tonumber(param)
+		if not id then
+			return false, "Invalid usage, see /help area_openfarming."
+		end
+
+		if not areas:isAreaOwner(id, name) then
+			return false, "Area "..id.." does not exist"
+					.." or is not owned by you."
+		end
+		local openfarming = not areas.areas[id].openfarming
+		-- Save false as nil to avoid inflating the DB.
+		areas.areas[id].openfarming = openfarming or nil
+		areas:save()
+		return true, ("Area %s to farming."):format(openfarming and "opened" or "closed")
+	end
+})
+
+
 minetest.register_chatcommand("move_area", {
 	params = "<ID>",
 	description = "Move (or resize) an area to the current positions.",
@@ -402,4 +424,64 @@ minetest.register_chatcommand("area_info", {
 		return true, table.concat(lines, "\n")
 	end,
 })
+
+
+--MFF DEBUT crabman(17/09/2015 ) respawn player at in special area(event) if a spawn is set.
+minetest.register_chatcommand("area_addspawn", {
+	params = "<ID>",
+		privs = areas.adminPrivs,
+	description = "Define special spawn for area",
+	func = function(name, param)
+		local id = param:match("^(%d+)")
+		if not id then
+			return false, "Invalid usage, see /help area_addspawn."
+		end
+
+		id = tonumber(id)
+		if not id then
+			return false, "Error, Param id must be int."
+		end
+
+		local player = minetest.get_player_by_name(name)
+		if not player then
+			return false, "Error, there is not player"
+		end
+		local pos = player:getpos()
+		if not pos then
+			return false, "Error, there is not pos."
+		end
+
+		if not areas.areas[id] then
+			return false, "Area ".. id .." does not exist."
+		end
+		areas.areas[id].spawn = pos
+		areas:save()
+		return true, "spawn of area ".. id .." defined."
+	end
+})
+
+minetest.register_chatcommand("area_delspawn", {
+	params = "<ID>",
+		privs = areas.adminPrivs,
+	description = "Delete special spawn of area",
+	func = function(name, param)
+		local id = param:match("^(%d+)")
+		if not id then
+			return false, "Invalid usage, see /help area_delspawn."
+		end
+
+		id = tonumber(id)
+		if not id then
+			return false, "Error, Param id must be int."
+		end
+
+		if not areas.areas[id] then
+			return false, "Area ".. id .." does not exist."
+		end
+		areas.areas[id].spawn = nil
+		areas:save()
+		return true, "spawn of area ".. id .." deleted."
+	end
+})
+-- FIN
 
