@@ -193,8 +193,8 @@ function areas:canPlayerAddArea(pos1, pos2, name)
 	-- and if the area is too big.
 	if not self.config.self_protection or
 			not privs[areas.config.self_protection_privilege] then
-		return false, "Self protection is disabled or you do not have"
-				.." the necessary privilege."
+		return false, S("Self protection is disabled or you do not have"
+				.." the necessary privilege.")
 	end
 
 	-- MFF: megabuilders skip checks on size and number of areas.
@@ -207,7 +207,7 @@ function areas:canPlayerAddArea(pos1, pos2, name)
 				(pos2.x - pos1.x) > max_size.x or
 				(pos2.y - pos1.y) > max_size.y or
 				(pos2.z - pos1.z) > max_size.z then
-			return false, "Area is too big."
+			return false, S("Area is too big.")
 		end
 
 		-- Check number of areas the user has and make sure it not above the max
@@ -221,8 +221,8 @@ function areas:canPlayerAddArea(pos1, pos2, name)
 				self.config.self_protection_max_areas_high or
 				self.config.self_protection_max_areas
 		if count >= max_areas then
-			return false, "You have reached the maximum amount of"
-					.." areas that you are allowed to  protect."
+			return false, S("You have reached the maximum amount of"
+					.." areas that you are allowed to protect.")
 		end
 	end
 
@@ -230,7 +230,7 @@ function areas:canPlayerAddArea(pos1, pos2, name)
 	local can, id = self:canMakeArea(pos1, pos2, name)  --MFF crabman(25/02/2016) fix areas in areas
 	if not can then
 		local area = self.areas[id]
-		return false, ("The area intersects with %s [%u] (%s).")
+		return false, (S("The area intersects with %s [%u] (%s)."))
 				:format(area.name, id, area.owner)
 	end
 

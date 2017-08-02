@@ -1,5 +1,7 @@
 local world_path = minetest.get_worldpath()
 
+local S = areas.intllib
+
 areas.config = {}
 
 local function setting(tp, name, default)
@@ -14,7 +16,7 @@ local function setting(tp, name, default)
 	elseif tp == "number" then
 		value = tonumber(minetest.setting_get(full_name))
 	else
-		error("Invalid setting type!")
+		error(S("Invalid setting type!"))
 	end
 	if value == nil then
 		value = default
